@@ -43,15 +43,19 @@ export function initFirebase() {
 }
 
 function makeModel(mode) {
-  return getGenerativeModel(ai, {
-    mode,
-    ...(mode === InferenceMode.ONLY_IN_CLOUD ? { model: CLOUD_MODEL } : {}),
+  const base = {
     systemInstruction: SYSTEM_INSTRUCTION,
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: RESPONSE_SCHEMA
     }
-  });
+  };
+  if (mode === InferenceMode.ONLY_IN_CLOUD) {
+    // Cloud model must be set via `model` here; with `mode` set, the SDK
+    // ignores a top-level model and falls back to its default.
+    return getGenerativeModel(ai, { model: CLOUD_MODEL, ...base });
+  }
+  return getGenerativeModel(ai, { mode, ...base });
 }
 
 // Probe on-device availability without sending any content anywhere.
