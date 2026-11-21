@@ -125,6 +125,7 @@ function renderResult(data, path) {
 }
 
 function showConsent() {
+  setStatus('');
   return new Promise((resolve) => {
     consentZone.innerHTML = `<div class="consent">
       <h3>Choose what happens next.</h3>

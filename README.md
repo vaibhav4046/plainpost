@@ -18,6 +18,8 @@ PlainPost turns an official letter into a short explanation: what it means, what
 
 The examples are synthetic. Do not paste sensitive personal information into the cloud demo. Check every amount and deadline against the original letter. For decisions, verify through an independently found official website or a number you already trust.
 
+![Actual cloud result for a synthetic council letter](docs/evidence/cloud-result.png)
+
 ## Firebase AI Logic integration
 
 The browser imports the Firebase JavaScript SDK 13.4.0 directly from Google's CDN. `docs/src/engine.mjs` calls `getAI`, `getGenerativeModel`, `initializeDeviceModel` and `generateContent` at runtime. This is not a pre-generated explanation or a server proxy.
@@ -52,7 +54,7 @@ Desktop Chrome with the Prompt API and an actual Gemini Nano download is require
 
 The current development environment cannot run a real Nano model. A Chromium test build exposed a placeholder Prompt API, not a genuine model, and its output was rejected. That is **not** evidence of on-device inference. Local-model execution remains a release/submission validation gap. The application must not be described as having passed both inference paths until that check is complete.
 
-Cloud inference was exercised through the deployed interface on 21 November 2026 before the SDK/UI revision. The revised SDK configuration still needs a deployed live-cloud check. Automated schema and consent tests are useful, but do not prove model quality or real on-device execution.
+Cloud inference was exercised through the revised deployed interface on 21 November 2026 using Firebase SDK 13.4.0. The synthetic council letter returned GBP 412.00, GBP 95.00 and the relative deadline, with the cloud path disclosed. A separate real cloud image-input test read GBP 86.40, reference TEST-2046 and 4 December 2026 from a synthetic photo letter. It omitted the already-paid condition from the action, an observed quality failure that prompted a stricter instruction; this is not yet a solved reliability claim. Automated schema and consent tests are useful, but do not prove model quality or real on-device execution.
 
 ## Tests
 
@@ -60,7 +62,7 @@ Cloud inference was exercised through the deployed interface on 21 November 2026
 npm test
 ```
 
-Tests cover structured response validation and separate cloud/device configuration. Any simulated-model UI tests are explicitly marked as simulations. They are not benchmark scores, user studies, or evidence that a real local model works.
+Sixteen tests cover structured response validation, separate cloud/device configuration, and explicitly simulated routing through consent, local failure and empty-input cases. Any simulated-model UI tests are explicitly marked as simulations. They are not benchmark scores, user studies, or evidence that a real local model works.
 
 ## Design and safety choices
 
