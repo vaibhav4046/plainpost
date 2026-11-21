@@ -3,13 +3,14 @@
 // Cloud (Gemini Developer API free tier) is used ONLY after explicit user consent,
 // or when the user asks for it directly. The result always says which path ran.
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
-import { initializeAppCheck, ReCaptchaV3Provider, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/12.5.0/firebase-app-check.js';
-import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode } from 'https://www.gstatic.com/firebasejs/12.5.0/firebase-ai.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js';
+import { initializeAppCheck, ReCaptchaV3Provider, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-app-check.js';
+import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-ai.js';
 import { firebaseConfig, appCheckSiteKey } from './firebase-config.mjs';
-import { SYSTEM_INSTRUCTION, RESPONSE_SCHEMA, buildPrompt } from './prompts.mjs';
+import { buildPrompt } from './prompts.mjs';
+import { modelConfig, deviceOptions, parseResult } from './model-config.mjs';
 
-const CLOUD_MODEL = 'gemini-3.5-flash-lite';
+
 
 // Localhost development uses an App Check debug token (gitignored file, never deployed).
 let debugToken = null;
@@ -42,29 +43,17 @@ export function initFirebase() {
   return app;
 }
 
-function makeModel(mode) {
-  const base = {
-    systemInstruction: SYSTEM_INSTRUCTION,
-    generationConfig: {
-      responseMimeType: 'application/json',
-      responseSchema: RESPONSE_SCHEMA
-    }
-  };
-  if (mode === InferenceMode.ONLY_IN_CLOUD) {
-    // Cloud model must be set via `model` here; with `mode` set, the SDK
-    // ignores a top-level model and falls back to its default.
-    return getGenerativeModel(ai, { model: CLOUD_MODEL, ...base });
-  }
-  return getGenerativeModel(ai, { mode, ...base });
+function makeModel(mode, image = false) {
+  return getGenerativeModel(ai, modelConfig(mode, image), { timeout: 60000 });
 }
 
 // Probe on-device availability without sending any content anywhere.
 // Returns 'ready' | 'needs-download' | 'unavailable'
-export async function probeOnDevice() {
+export async function probeOnDevice(image = false) {
   initFirebase();
   if (!('LanguageModel' in self)) return 'unavailable';
   try {
-    const availability = await LanguageModel.availability();
+    const availability = await LanguageModel.availability(deviceOptions(image));
     if (availability === 'available') return 'ready';
     if (availability === 'downloadable' || availability === 'downloading') return 'needs-download';
     return 'unavailable';
@@ -81,8 +70,8 @@ export async function warmOnDevice(onProgress) {
 }
 
 // Run inference strictly on-device. Throws if unavailable.
-async function runOnDevice(parts) {
-  const model = makeModel(InferenceMode.ONLY_ON_DEVICE);
+async function runOnDevice(parts, image) {
+  const model = makeModel(InferenceMode.ONLY_ON_DEVICE, image);
   await model.initializeDeviceModel(() => {});
   const result = await model.generateContent(parts);
   return result;
@@ -92,11 +81,6 @@ async function runOnDevice(parts) {
 async function runInCloud(parts) {
   const model = makeModel(InferenceMode.ONLY_IN_CLOUD);
   return model.generateContent(parts);
-}
-
-function parseJson(result) {
-  const text = result.response.text();
-  return JSON.parse(text);
 }
 
 // Main entry.
@@ -115,14 +99,14 @@ export async function explainLetter(input, { onStatus = () => {}, shouldUseCloud
   if (!parts.length) throw new Error('Nothing to explain.');
 
   // 1) On-device first - nothing leaves the device.
-  const probe = await probeOnDevice();
+  const probe = await probeOnDevice(!!input.image);
   if (probe !== 'unavailable') {
     onStatus(probe === 'needs-download'
       ? 'Preparing the on-device model (first use downloads it - this can take a few minutes)...'
       : 'Explaining on your device - nothing is being sent anywhere...');
     try {
-      const result = await runOnDevice(parts);
-      return { data: parseJson(result), path: 'on-device' };
+      const result = await runOnDevice(parts, !!input.image);
+      return { data: parseResult(result), path: 'on-device' };
     } catch (e) {
       console.warn('on-device failed, will offer cloud', e);
     }
@@ -134,5 +118,5 @@ export async function explainLetter(input, { onStatus = () => {}, shouldUseCloud
   if (!agreed) throw Object.assign(new Error('You chose not to use the cloud.'), { code: 'cloud-declined' });
   onStatus('Explaining in the cloud (you agreed)...');
   const result = await runInCloud(parts);
-  return { data: parseJson(result), path: 'cloud' };
+  return { data: parseResult(result), path: 'cloud' };
 }

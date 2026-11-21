@@ -3,66 +3,44 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlainPost - official letters, made plain</title>
-<meta name="description" content="Paste an official letter. PlainPost explains it in plain English - on your own device when your browser supports it, so nothing is sent anywhere.">
+<title>PlainPost | A little clarity for the post.</title>
+<meta name="description" content="Understand official letters in plain English. On-device first, cloud only with your permission.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
-  <h1>PlainPost</h1>
-  <p>Got an official letter you don't fully understand? Paste it here.
-  PlainPost explains what it means and what you need to do, in plain English.
-  When your browser supports it, the explanation runs <strong>entirely on your device</strong> -
-  nothing you paste is sent anywhere. If not, you choose before anything is sent.</p>
+  <a class="brand" href="./" aria-label="PlainPost home"><span class="stamp" aria-hidden="true">P.</span> PlainPost</a>
+  <span class="edition">LESS WORRY. MORE CLARITY.</span>
 </header>
-
 <main>
-  <div class="input-card">
-    <textarea id="letterText" rows="9"
-      placeholder="Paste the whole letter here - including any dates, amounts and reference numbers"></textarea>
-    <div class="row">
-      <button id="explainBtn" class="primary">Explain this letter</button>
-      <button id="clearBtn">Clear</button>
-      <label class="photo">
-        <input type="file" id="photoInput" accept="image/jpeg,image/png" hidden>
-        <span class="photo-btn">Add a photo instead</span>
-      </label>
-    </div>
-    <p id="photoName" class="photo-name"></p>
-    <p class="examples-label">Try a synthetic example:</p>
-    <div class="row examples">
-      <button data-example="council">Council tax reminder</button>
-      <button data-example="bank">Bank overdraft letter</button>
-      <button data-example="nhs">NHS appointment letter</button>
-    </div>
-    <p class="fine">The examples are made up for demonstration. They are not real letters from those organisations.</p>
-  </div>
-
-  <p id="statusZone" class="status" hidden></p>
-
-  <div id="consentZone" hidden></div>
-
-  <div id="resultZone" hidden></div>
-
-  <section class="please-read">
-    <h3>Please read</h3>
-    <p>PlainPost is an explainer, not an adviser. It can misread a letter, and it can miss things.
-    For anything important - money, deadlines, your health - rely on the letter itself and contact
-    the organisation using the details printed on it. If a letter mentions your health, questions go
-    to the clinic or your GP. If it demands money and you are unsure it is real, check the
-    organisation's official website or a number you already trust before paying.</p>
-    <p>PlainPost has no account, no server of its own and no tracking. On supported browsers
-    (desktop Chrome 139+) the AI runs on your device and the letter never leaves it. On other
-    browsers, cloud explanation is offered only after you agree, letter by letter.</p>
+  <section class="intro">
+    <p class="eyebrow">THE EVERYDAY LETTER EXPLAINER</p>
+    <h1>Important post.<br><em>Plain English.</em></h1>
+    <p class="lead">Find the meaning, the money, and the next step.<br>Without having to make sense of it all at once.</p>
+    <p class="privacy-line"><span aria-hidden="true">◈</span> On-device first. Cloud only if you choose.</p>
   </section>
+  <div class="workspace">
+    <section class="input-card" aria-labelledby="inputTitle">
+      <div class="panel-heading"><span class="step">01</span><h2 id="inputTitle">Your letter</h2><button id="clearBtn" class="text-button">Clear</button></div>
+      <label class="input-label" for="letterText">Paste the letter, including dates and amounts</label>
+      <textarea id="letterText" rows="12" maxlength="16000" placeholder="Dear…"></textarea>
+      <div class="input-footer"><label class="photo"><input type="file" id="photoInput" accept="image/jpeg,image/png"><span>Add a photo (JPG / PNG)</span></label><span class="fine">Not saved by PlainPost</span></div>
+      <p id="photoName" class="photo-name" hidden></p>
+      <button id="explainBtn" class="primary">Make this clear <span aria-hidden="true">↗</span></button>
+      <div class="examples-block"><p class="examples-label">JUST EXPLORING? TRY A MADE-UP LETTER</p><div class="examples"><button data-example="council">Council tax</button><button data-example="bank">Overdraft</button><button data-example="nhs">Appointment</button></div><p class="fine">Synthetic examples, not real letters or contact details.</p></div>
+      <p id="deviceStatus" class="device-status" role="status">Checking whether this browser can explain on-device…</p>
+    </section>
+    <section class="output-card" aria-labelledby="outputTitle">
+      <div class="panel-heading"><span class="step">02</span><h2 id="outputTitle">A clearer picture</h2></div>
+      <p id="statusZone" class="status" role="status" aria-live="polite" hidden></p>
+      <div id="consentZone" hidden></div>
+      <div id="emptyState" class="empty-state"><div class="letter-mark" aria-hidden="true">↳</div><h3>One letter.<br>A little less uncertainty.</h3><p>Your explanation will appear here, with the next steps and anything the letter leaves unclear.</p><span class="small-rule"></span><p class="fine">The original letter is always the source of truth.</p></div>
+      <div id="resultZone" aria-live="polite" hidden></div>
+    </section>
+  </div>
+  <section class="please-read"><h2>Clarity, not advice.</h2><p>AI can misread a letter. Check amounts and deadlines against the original. For money, health or legal decisions, ask the organisation through an independently found official website or a number you already trust. A scam warning is not proof; no warning is not reassurance.</p><details><summary>What happens to your letter?</summary><p>PlainPost does not save your letter or create an account. A compatible desktop Chrome setup with Gemini Nano can explain it on-device. Chrome version alone does not guarantee availability. If the local model cannot finish, cloud processing is offered only with your permission, for that letter.</p><p>Cloud processing sends the letter or photo to Google's Gemini API through Firebase AI Logic. Do not send sensitive personal information. Google processes requests under its own terms. Firebase App Check uses reCAPTCHA Enterprise to protect the service; it may contact Google independently of letter processing.</p><p><a href="https://ai.google.dev/gemini-api/terms">Gemini API terms</a> · <a href="https://policies.google.com/privacy">Google privacy policy</a></p></details></section>
 </main>
-
-<footer>
-  <p>Built for #BuildHybridAI 2026 with Firebase AI Logic - on-device (Gemini Nano in Chrome) and
-  cloud (Gemini API) hybrid inference. Free, no account.
-  <a href="https://github.com/vaibhav4046/plainpost">Source code</a>.</p>
-</footer>
-
+<footer><span class="brand-small">PlainPost</span><span>Built with Firebase AI Logic. An experimental letter explainer.</span><a href="https://github.com/vaibhav4046/plainpost">Source code ↗</a></footer>
 <script type="module" src="app.js"></script>
 </body>
 </html>

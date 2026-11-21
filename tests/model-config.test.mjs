@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { modelConfig, deviceOptions, parseResult } from '../docs/src/model-config.mjs';
+const valid = {letter_type:'Reminder',who_from:'Example Council',plain_summary:'A balance is due.',reassurance:'Check the letter.',actions:[{action:'Check the balance',by_when:'No date stated'}],amounts:[{label:'Balance',amount:'GBP 412'}],urgency:'needs action',possible_scam:false};
+const wrap = data => ({response:{text:()=>JSON.stringify(data)}});
+test('hybrid configuration nests model parameters instead of silently ignoring them',()=>{const c=modelConfig('only_on_device');assert.equal(c.mode,'only_on_device');assert.equal(c.inCloudParams.model,'gemini-3.5-flash-lite');assert.equal(c.model,undefined);assert.ok(c.onDeviceParams.createOptions.initialPrompts[0].content[0].value.includes('untrusted'));assert.ok(c.onDeviceParams.promptOptions.responseConstraint.properties.actions);});
+test('availability is probed for the same input types used for generation',()=>{assert.deepEqual(deviceOptions().expectedInputs,[{type:'text',languages:['en']}]);assert.equal(deviceOptions(true).expectedInputs[1].type,'image');});
+test('valid structured result is accepted',()=>assert.deepEqual(parseResult(wrap(valid)),valid));
+test('invalid JSON is rejected',()=>assert.throws(()=>parseResult({response:{text:()=>'{'}})));
+test('missing amounts do not become a plausible result',()=>assert.throws(()=>parseResult(wrap({...valid,amounts:undefined}))));
+test('invalid actions do not render',()=>assert.throws(()=>parseResult(wrap({...valid,actions:[{}]}))));
+test('a string false is not silently treated as a scam',()=>assert.throws(()=>parseResult(wrap({...valid,possible_scam:'false'}))));
+test('invalid urgency is rejected',()=>assert.throws(()=>parseResult(wrap({...valid,urgency:'panic'}))));
+test('missing summary is rejected',()=>assert.throws(()=>parseResult(wrap({...valid,plain_summary:undefined}))));

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ScamScreen local dev server - static files only, zero deps. Node 18+.
+// PlainPost local dev server - static files only, zero deps. Node 18+.
 // The analysis itself is 100% client-side JavaScript; this server only serves files.
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -13,8 +13,8 @@ http.createServer(async (req, res) => {
   let p = url.pathname === '/' ? '/index.html' : url.pathname;
   if (p.includes('..')) { res.writeHead(400); return res.end('nope'); }
   try {
-    const data = await readFile(join(ROOT, 'public', p));
+    const data = await readFile(join(ROOT, 'docs', p));
     res.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' });
     res.end(data);
   } catch { res.writeHead(404); res.end('not found'); }
-}).listen(PORT, () => console.log(`ScamScreen at http://localhost:${PORT}`));
+}).listen(PORT, () => console.log(`PlainPost at http://localhost:${PORT}`));
