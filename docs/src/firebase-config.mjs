@@ -13,4 +13,4 @@ export const firebaseConfig = {
 
 // reCAPTCHA Enterprise (Fraud Defense) site key for Firebase App Check. Empty string = App Check skipped
 // (only valid while the console has AI Logic App Check unenforced, e.g. early local dev).
-export const appCheckSiteKey = '';
+export const appCheckSiteKey = '6Lf2wiouAAAAAFi2W3xXHhPeAtne-IUc1qjZSNh5';
