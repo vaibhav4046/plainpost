@@ -9,7 +9,7 @@ import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode } from 'https
 import { firebaseConfig, appCheckSiteKey } from './firebase-config.mjs';
 import { SYSTEM_INSTRUCTION, RESPONSE_SCHEMA, buildPrompt } from './prompts.mjs';
 
-const CLOUD_MODEL = 'gemini-3.8-flash';
+const CLOUD_MODEL = 'gemini-3.5-flash-lite';
 
 // Localhost development uses an App Check debug token (gitignored file, never deployed).
 let debugToken = null;
