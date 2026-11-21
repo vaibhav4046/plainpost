@@ -1,0 +1,8 @@
+{
+  "name": "plainpost",
+  "version": "0.1.0",
+  "description": "Official letters, made plain. Hybrid on-device/cloud AI built with Firebase AI Logic for #BuildHybridAI 2026.",
+  "type": "module",
+  "scripts": { "start": "node run.mjs" },
+  "license": "MIT"
+}
